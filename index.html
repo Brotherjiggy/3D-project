@@ -115,19 +115,88 @@
         scene.add(ambientLight);
 
 
-        // 10. ANIMATION
-        function animate() {
+        // 10. TOUCH CONTROLS
 
-            requestAnimationFrame(animate);
+let isDragging = false;
 
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.015;
+let previousX = 0;
+let previousY = 0;
 
-            renderer.render(
-                scene,
-                camera
-            );
-        }
+
+// Finger touches screen
+renderer.domElement.addEventListener(
+    "touchstart",
+    (event) => {
+
+        isDragging = true;
+
+        previousX = event.touches[0].clientX;
+        previousY = event.touches[0].clientY;
+
+    },
+    { passive: true }
+);
+
+
+// Finger moves
+renderer.domElement.addEventListener(
+    "touchmove",
+    (event) => {
+
+        if (!isDragging) return;
+
+        const currentX =
+            event.touches[0].clientX;
+
+        const currentY =
+            event.touches[0].clientY;
+
+
+        const movementX =
+            currentX - previousX;
+
+        const movementY =
+            currentY - previousY;
+
+
+        cube.rotation.y += movementX * 0.01;
+
+        cube.rotation.x += movementY * 0.01;
+
+
+        previousX = currentX;
+        previousY = currentY;
+
+    },
+    { passive: true }
+);
+
+
+// Finger leaves screen
+renderer.domElement.addEventListener(
+    "touchend",
+    () => {
+
+        isDragging = false;
+
+    }
+);
+
+
+// 11. ANIMATION
+function animate() {
+
+    requestAnimationFrame(animate);
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+
+// 12. START
+animate();
 
 
         // 11. START THE 3D WORLD
