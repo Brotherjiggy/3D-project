@@ -1,149 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My First 3D Project</title>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Realistic 3D</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html,
         body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            background: #000;
+            background: #020204;
         }
 
         canvas {
             display: block;
             width: 100%;
-            height: 100vh;
+            height: 100%;
         }
+
     </style>
+
 </head>
+
 
 <body>
 
-    <script type="module">
+<script type="module">
 
-        import * as THREE from
-        "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
-
-
-        // 1. CREATE THE 3D WORLD
-        const scene = new THREE.Scene();
-
-        scene.background = new THREE.Color(0x050505);
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
-        // 2. CREATE THE CAMERA
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
+// ============================================
+// 1. CREATE THE 3D WORLD
+// ============================================
 
-        camera.position.z = 5;
+const scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0x020204);
 
 
-        // 3. CREATE THE RENDERER
-        const renderer = new THREE.WebGLRenderer({
-            antialias: true
-        });
+// ============================================
+// 2. CAMERA
+// ============================================
 
-        renderer.setPixelRatio(
-            Math.min(window.devicePixelRatio, 2)
-        );
+const camera =
+    new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth /
+        window.innerHeight,
+        0.1,
+        100
+    );
 
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
-
-        document.body.appendChild(renderer.domElement);
-
-
-        // 4. CREATE A 3D CUBE
-        const geometry = new THREE.BoxGeometry(
-            2,
-            2,
-            2
-        );
+camera.position.set(
+    0,
+    0,
+    6
+);
 
 
-        // 5. CREATE THE CUBE MATERIAL
-        const material = new THREE.MeshStandardMaterial({
-            color: 0xffb000,
-            metalness: 0.5,
-            roughness: 0.25
-        });
+// ============================================
+// 3. HIGH-RESOLUTION RENDERER
+// ============================================
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias: true
+    });
 
 
-        // 6. COMBINE GEOMETRY + MATERIAL
-        const cube = new THREE.Mesh(
-            geometry,
-            material
-        );
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+);
 
 
-        // 7. PUT THE CUBE INTO THE WORLD
-        scene.add(cube);
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
 
 
-        // 8. ADD LIGHT
-        const light = new THREE.DirectionalLight(
-            0xffffff,
-            3
-        );
+// Enable shadows
 
-        light.position.set(3, 3, 5);
+renderer.shadowMap.enabled = true;
 
-        scene.add(light);
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
 
 
-        // 9. ADD AMBIENT LIGHT
-        const ambientLight = new THREE.AmbientLight(
-            0xffffff,
-            0.5
-        );
-
-        scene.add(ambientLight);
+document.body.appendChild(
+    renderer.domElement
+);
 
 
-        // 10. TOUCH CONTROLS
+// ============================================
+// 4. CREATE THE SPHERE
+// ============================================
+
+const geometry =
+    new THREE.SphereGeometry(
+        1.5,
+        128,
+        128
+    );
+
+
+// ============================================
+// 5. REALISTIC MATERIAL
+// ============================================
+
+const material =
+    new THREE.MeshStandardMaterial({
+
+        color: 0xffb000,
+
+        metalness: 0.75,
+
+        roughness: 0.2
+
+    });
+
+
+// ============================================
+// 6. CREATE THE OBJECT
+// ============================================
+
+const sphere =
+    new THREE.Mesh(
+        geometry,
+        material
+    );
+
+
+sphere.castShadow = true;
+
+sphere.receiveShadow = true;
+
+
+scene.add(sphere);
+
+
+// ============================================
+// 7. FLOOR
+// ============================================
+
+const floorGeometry =
+    new THREE.PlaneGeometry(
+        20,
+        20
+    );
+
+
+const floorMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color: 0x080808,
+
+        metalness: 0.2,
+
+        roughness: 0.7
+
+    });
+
+
+const floor =
+    new THREE.Mesh(
+        floorGeometry,
+        floorMaterial
+    );
+
+
+floor.rotation.x =
+    -Math.PI / 2;
+
+
+floor.position.y =
+    -1.6;
+
+
+floor.receiveShadow = true;
+
+
+scene.add(floor);
+
+
+// ============================================
+// 8. MAIN LIGHT
+// ============================================
+
+const mainLight =
+    new THREE.DirectionalLight(
+        0xffffff,
+        4
+    );
+
+
+mainLight.position.set(
+    3,
+    5,
+    4
+);
+
+
+mainLight.castShadow = true;
+
+
+mainLight.shadow.mapSize.width =
+    2048;
+
+mainLight.shadow.mapSize.height =
+    2048;
+
+
+scene.add(mainLight);
+
+
+// ============================================
+// 9. AMBIENT LIGHT
+// ============================================
+
+const ambientLight =
+    new THREE.AmbientLight(
+        0xffffff,
+        0.25
+    );
+
+
+scene.add(
+    ambientLight
+);
+
+
+// ============================================
+// 10. SECOND LIGHT
+// ============================================
+
+const rimLight =
+    new THREE.PointLight(
+        0xffffff,
+        20,
+        10
+    );
+
+
+rimLight.position.set(
+    -4,
+    2,
+    -3
+);
+
+
+scene.add(
+    rimLight
+);
+
+
+// ============================================
+// 11. TOUCH CONTROLS
+// ============================================
 
 let isDragging = false;
 
 let previousX = 0;
+
 let previousY = 0;
 
 
-// Finger touches screen
 renderer.domElement.addEventListener(
     "touchstart",
     (event) => {
 
         isDragging = true;
 
-        previousX = event.touches[0].clientX;
-        previousY = event.touches[0].clientY;
+        previousX =
+            event.touches[0].clientX;
+
+        previousY =
+            event.touches[0].clientY;
 
     },
     { passive: true }
 );
 
 
-// Finger moves
 renderer.domElement.addEventListener(
     "touchmove",
     (event) => {
 
         if (!isDragging) return;
+
 
         const currentX =
             event.touches[0].clientX;
@@ -159,12 +324,16 @@ renderer.domElement.addEventListener(
             currentY - previousY;
 
 
-        cube.rotation.y += movementX * 0.01;
+        sphere.rotation.y +=
+            movementX * 0.01;
 
-        cube.rotation.x += movementY * 0.01;
+
+        sphere.rotation.x +=
+            movementY * 0.01;
 
 
         previousX = currentX;
+
         previousY = currentY;
 
     },
@@ -172,7 +341,6 @@ renderer.domElement.addEventListener(
 );
 
 
-// Finger leaves screen
 renderer.domElement.addEventListener(
     "touchend",
     () => {
@@ -183,52 +351,62 @@ renderer.domElement.addEventListener(
 );
 
 
-// 11. ANIMATION
+// ============================================
+// 12. ANIMATION
+// ============================================
+
 function animate() {
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+        animate
+    );
+
 
     renderer.render(
         scene,
         camera
     );
+
 }
 
 
-// 12. START
 animate();
 
 
-        // 11. START THE 3D WORLD
-        animate();
+// ============================================
+// 13. RESPONSIVE SCREEN
+// ============================================
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
 
 
-        // 12. MAKE IT RESPONSIVE
-        window.addEventListener(
-            "resize",
-            () => {
+        camera.updateProjectionMatrix();
 
-                camera.aspect =
-                    window.innerWidth /
-                    window.innerHeight;
 
-                camera.updateProjectionMatrix();
-
-                renderer.setSize(
-                    window.innerWidth,
-                    window.innerHeight
-                );
-
-                renderer.setPixelRatio(
-                    Math.min(
-                        window.devicePixelRatio,
-                        2
-                    )
-                );
-            }
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
         );
 
-    </script>
+
+        renderer.setPixelRatio(
+            Math.min(
+                window.devicePixelRatio,
+                2
+            )
+        );
+
+    }
+);
+
+</script>
 
 </body>
+
 </html>
